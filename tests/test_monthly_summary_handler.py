@@ -1,7 +1,8 @@
 import unittest
 
 from tbyn_bot.config import Config
-from tbyn_bot.workflows.monthly_summary.handler import MonthlySummaryHandler
+from tbyn_bot.workflows.event_poll import POLL_EVENT_COMMAND
+from tbyn_bot.workflows.monthly_summary import MONTHLY_SUMMARY_COMMAND, MonthlySummaryHandler
 
 from tests.fakes import FakeTelegramClient, group_update
 
@@ -24,7 +25,7 @@ class MonthlySummaryHandlerTest(unittest.TestCase):
 
         handler = MonthlySummaryHandler(client, config(), send_summary=send_summary)
 
-        handled = handler.handle_update(group_update("/monthly_summary"))
+        handled = handler.handle_update(group_update(MONTHLY_SUMMARY_COMMAND))
 
         self.assertTrue(handled)
         self.assertEqual(calls, [(config(), client, -1001)])
@@ -39,7 +40,7 @@ class MonthlySummaryHandlerTest(unittest.TestCase):
             send_summary=lambda *args: calls.append(args),
         )
 
-        handled = handler.handle_update(group_update("/monthly_summary@TBYNBot"))
+        handled = handler.handle_update(group_update(f"{MONTHLY_SUMMARY_COMMAND}@TBYNBot"))
 
         self.assertTrue(handled)
         self.assertEqual(len(calls), 1)
@@ -54,7 +55,7 @@ class MonthlySummaryHandlerTest(unittest.TestCase):
             schedule_delete=lambda *args: scheduled.append(args),
         )
 
-        handled = handler.handle_update(group_update("/monthly_summary"))
+        handled = handler.handle_update(group_update(MONTHLY_SUMMARY_COMMAND))
 
         self.assertTrue(handled)
         self.assertIn("Only group admins", client.sent_messages[0][1])
@@ -76,7 +77,7 @@ class MonthlySummaryHandlerTest(unittest.TestCase):
         )
 
         with self.assertLogs(level="ERROR"):
-            handled = handler.handle_update(group_update("/monthly_summary"))
+            handled = handler.handle_update(group_update(MONTHLY_SUMMARY_COMMAND))
 
         self.assertTrue(handled)
         self.assertIn("Monthly summary is not configured", client.sent_messages[0][1])
@@ -86,7 +87,7 @@ class MonthlySummaryHandlerTest(unittest.TestCase):
         client = FakeTelegramClient()
         handler = MonthlySummaryHandler(client, config())
 
-        handled = handler.handle_update(group_update("/poll_event Test"))
+        handled = handler.handle_update(group_update(f"{POLL_EVENT_COMMAND} Test"))
 
         self.assertFalse(handled)
         self.assertEqual(client.chat_member_requests, [])

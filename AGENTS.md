@@ -115,5 +115,12 @@ Trigger an event poll from Telegram:
 Trigger the monthly summary from Telegram:
 
 ```text
-/monthly_summary
+/events_this_month
+```
+
+The bot registers Telegram command suggestions on startup. To re-register them
+manually without starting the polling loop:
+
+```bash
+python3 -m tbyn_bot.bot_commands
 ```

@@ -1,7 +1,7 @@
 import unittest
 
 from tbyn_bot.bot.dispatcher import UpdateDispatcher
-from tbyn_bot.workflows.event_poll import EventPollHandler
+from tbyn_bot.workflows.event_poll import POLL_EVENT_COMMAND, EventPollHandler
 
 from tests.fakes import FakeTelegramClient, group_update
 
@@ -12,7 +12,7 @@ class EventPollHandlerTest(unittest.TestCase):
         scheduled = []
         handler = EventPollHandler(client, schedule_delete=lambda *args: scheduled.append(args))
 
-        handled = handler.handle_update(group_update("/poll_event Meeting on 6th June"))
+        handled = handler.handle_update(group_update(f"{POLL_EVENT_COMMAND} Meeting on 6th June"))
 
         self.assertTrue(handled)
         self.assertEqual(len(client.sent_polls), 1)
@@ -31,7 +31,7 @@ class EventPollHandlerTest(unittest.TestCase):
             schedule_delete=lambda *args: scheduled.append(args),
         )
 
-        handled = handler.handle_update(group_update("/poll_event"))
+        handled = handler.handle_update(group_update(POLL_EVENT_COMMAND))
 
         self.assertTrue(handled)
         self.assertEqual(client.sent_polls, [])
@@ -49,7 +49,7 @@ class EventPollHandlerTest(unittest.TestCase):
             schedule_delete=lambda *args: scheduled.append(args),
         )
 
-        handled = handler.handle_update(group_update("/poll_event Meeting on 6th June"))
+        handled = handler.handle_update(group_update(f"{POLL_EVENT_COMMAND} Meeting on 6th June"))
 
         self.assertTrue(handled)
         self.assertEqual(client.sent_polls, [])
@@ -66,7 +66,7 @@ class EventPollHandlerTest(unittest.TestCase):
         )
 
         with self.assertLogs(level="ERROR"):
-            handled = handler.handle_update(group_update("/poll_event Meeting on 6th June"))
+            handled = handler.handle_update(group_update(f"{POLL_EVENT_COMMAND} Meeting on 6th June"))
 
         self.assertTrue(handled)
         self.assertEqual(client.sent_polls, [])

@@ -54,6 +54,20 @@ The app reads `.env` automatically for local development. On a cloud host, set t
 3. Make the bot an admin if you want it to reliably check admin status and delete temporary validation messages.
 4. In BotFather, consider disabling privacy mode if the bot does not receive group commands.
 
+The bot registers its Telegram command menu when it starts. To re-register the
+menu manually without starting the polling loop, run:
+
+```bash
+python3 -m tbyn_bot.bot_commands
+```
+
+After startup or manual registration, typing `/` in a Telegram chat with the bot should show:
+
+```text
+/poll_event
+/events_this_month
+```
+
 ## Google Sheets Setup
 
 Use a Google service account for automation:
@@ -170,7 +184,7 @@ Example rows:
 In a Telegram group, an admin sends:
 
 ```text
-/monthly_summary
+/events_this_month
 ```
 
 The bot filters events for the current month and sends a Telegram message like:

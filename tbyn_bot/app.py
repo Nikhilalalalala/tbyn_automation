@@ -7,6 +7,7 @@ import time
 
 from .config import Config
 from .bot.dispatcher import UpdateDispatcher
+from .bot_commands import register_bot_commands
 from .integrations.telegram import TelegramClient
 from .utils.cleanup import schedule_delete_message
 from .workflows import build_update_handlers
@@ -16,6 +17,7 @@ def run(config: Config) -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
     client = TelegramClient(config.telegram_bot_token)
+    register_bot_commands(client)
     dispatcher = UpdateDispatcher(
         build_update_handlers(
             client=client,

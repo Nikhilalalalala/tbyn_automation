@@ -34,6 +34,9 @@ class TelegramClient:
     def delete_message(self, chat_id: int, message_id: int) -> dict:
         return self._call("deleteMessage", {"chat_id": chat_id, "message_id": message_id})
 
+    def set_my_commands(self, commands: list[dict]) -> bool:
+        return self._call("setMyCommands", {"commands": commands})
+
     def _call(self, method: str, payload: dict) -> Any:
         body = json.dumps(payload).encode("utf-8")
         req = request.Request(

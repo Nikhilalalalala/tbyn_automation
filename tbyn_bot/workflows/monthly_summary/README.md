@@ -38,7 +38,7 @@ python3 main.py
 Then send this command in a Telegram group where the bot is installed:
 
 ```text
-/monthly_summary
+/events_this_month
 ```
 
 ## Required Environment Variables
@@ -55,5 +55,5 @@ GOOGLE_EVENTS_RANGE
 ## Main Files
 
 - `events.py`: parses rows, filters current-month events, and formats the summary.
-- `handler.py`: handles the `/monthly_summary` Telegram command.
+- `handler.py`: handles the `/events_this_month` Telegram command.
 - `runner.py`: reads the Google Sheet and sends the Telegram message to the command's group.

@@ -1,4 +1,4 @@
-"""Monthly summary is triggered from Telegram with /monthly_summary."""
+"""Monthly summary is triggered from Telegram with /events_this_month."""
 
 from .runner import main
 

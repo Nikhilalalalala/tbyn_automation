@@ -53,7 +53,7 @@ def run_monthly_summary(config: Config, chat_id: int, today: date | None = None)
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
-    raise RuntimeError("Monthly summary now runs from Telegram with /monthly_summary")
+    raise RuntimeError("Monthly summary now runs from Telegram with /events_this_month")
 
 
 if __name__ == "__main__":

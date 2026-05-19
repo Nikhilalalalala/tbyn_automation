@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 
-MONTHLY_SUMMARY_COMMAND = "/monthly_summary"
+MONTHLY_SUMMARY_COMMAND = "/events_this_month"
 
 
 def is_monthly_summary_command(text: str) -> bool:
@@ -14,4 +14,3 @@ def is_monthly_summary_command(text: str) -> bool:
     first_part = text.partition(" ")[0]
     command_name = first_part.split("@", 1)[0]
     return command_name == MONTHLY_SUMMARY_COMMAND
-
