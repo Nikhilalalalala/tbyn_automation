@@ -19,6 +19,7 @@ def run(config: Config) -> None:
     dispatcher = UpdateDispatcher(
         build_update_handlers(
             client=client,
+            config=config,
             delete_after_seconds=config.validation_delete_after_seconds,
             schedule_delete=schedule_delete_message,
         )

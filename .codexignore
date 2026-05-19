@@ -1,0 +1,4 @@
+.env
+google-service-account.json
+tbyn-telebot-automation-*.json
+credentials/*.json

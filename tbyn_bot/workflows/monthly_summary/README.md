@@ -27,17 +27,24 @@ Whats happening this month:
 3. Board Game Afternoon @ The Nest @ TBCC - 29/3/2026
 ```
 
-## Running Manually
+## Command
+
+Run the Telegram bot:
 
 ```bash
-python3 -m tbyn_bot.workflows.monthly_summary
+python3 main.py
+```
+
+Then send this command in a Telegram group where the bot is installed:
+
+```text
+/monthly_summary
 ```
 
 ## Required Environment Variables
 
 ```text
 TELEGRAM_BOT_TOKEN
-MONTHLY_SUMMARY_CHAT_ID
 GOOGLE_SHEET_ID
 GOOGLE_SERVICE_ACCOUNT_FILE
 GOOGLE_EVENTS_RANGE
@@ -48,6 +55,5 @@ GOOGLE_EVENTS_RANGE
 ## Main Files
 
 - `events.py`: parses rows, filters current-month events, and formats the summary.
-- `runner.py`: reads the Google Sheet and sends the Telegram message.
-- `__main__.py`: entry point for `python3 -m tbyn_bot.workflows.monthly_summary`.
-
+- `handler.py`: handles the `/monthly_summary` Telegram command.
+- `runner.py`: reads the Google Sheet and sends the Telegram message to the command's group.

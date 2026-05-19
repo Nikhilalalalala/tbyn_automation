@@ -8,3 +8,7 @@ venv/
 dist/
 build/
 *.egg-info/
+
+google-service-account.json
+tbyn-telebot-automation-*.json
+credentials/*.json

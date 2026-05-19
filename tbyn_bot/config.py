@@ -12,7 +12,6 @@ class Config:
     telegram_bot_token: str
     validation_delete_after_seconds: int = 20
     polling_timeout_seconds: int = 30
-    monthly_summary_chat_id: str = ""
     google_sheet_id: str = ""
     google_service_account_file: str = ""
     google_events_range: str = "Events!A:D"
@@ -32,7 +31,6 @@ def load_config() -> Config:
             default=20,
         ),
         polling_timeout_seconds=_read_int("POLLING_TIMEOUT_SECONDS", default=30),
-        monthly_summary_chat_id=os.environ.get("MONTHLY_SUMMARY_CHAT_ID", "").strip(),
         google_sheet_id=os.environ.get("GOOGLE_SHEET_ID", "").strip(),
         google_service_account_file=os.environ.get("GOOGLE_SERVICE_ACCOUNT_FILE", "").strip(),
         google_events_range=os.environ.get("GOOGLE_EVENTS_RANGE", "Events!A:D").strip(),

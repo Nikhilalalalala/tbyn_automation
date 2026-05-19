@@ -31,6 +31,22 @@ class EventsTest(unittest.TestCase):
         self.assertEqual(events[4].event_date, date(2026, 3, 14))
         self.assertEqual(events[4].venue, "Science Centre Omni-Theatre")
 
+    def test_finds_header_row_when_range_starts_above_table(self):
+        rows = [
+            ["TBYN Events"],
+            [],
+            ["S/N", "Event Title", "Event Date", "Venue"],
+            ["1", "Youth Hangout! - Timeless Tiong Bahru!", "10/1/2026", "The Nest @ TBCC"],
+        ]
+
+        events = parse_events_sheet(rows)
+
+        self.assertEqual(len(events), 1)
+        self.assertEqual(events[0].serial_number, "1")
+        self.assertEqual(events[0].title, "Youth Hangout! - Timeless Tiong Bahru!")
+        self.assertEqual(events[0].event_date, date(2026, 1, 10))
+        self.assertEqual(events[0].venue, "The Nest @ TBCC")
+
     def test_filters_events_for_current_month(self):
         events = parse_events_sheet(SAMPLE_ROWS)
 

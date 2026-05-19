@@ -35,6 +35,4 @@ If the command is missing a title, or a non-admin tries to use the command, the 
 - `commands.py`: parses `/poll_event`.
 - `handler.py`: handles Telegram updates, admin checks, and sending polls.
 - `messages.py`: user-facing validation and permission messages.
-- `permissions.py`: admin status rules.
 - `polls.py`: poll payload and option variations.
-

@@ -20,10 +20,10 @@ def parse_events_sheet(rows: list[list[str]]) -> list[Event]:
     if not rows:
         return []
 
-    header_indexes = _header_indexes(rows[0])
+    header_row_index, header_indexes = _find_header_row(rows)
     events: list[Event] = []
 
-    for row in rows[1:]:
+    for row in rows[header_row_index + 1:]:
         if not any(cell.strip() for cell in row if isinstance(cell, str)):
             continue
 
@@ -45,6 +45,17 @@ def parse_events_sheet(rows: list[list[str]]) -> list[Event]:
         )
 
     return events
+
+
+def _find_header_row(rows: list[list[str]]) -> tuple[int, dict[str, int]]:
+    for index, row in enumerate(rows):
+        header_indexes = _header_indexes(row, raise_on_missing=False)
+        if header_indexes is not None:
+            return index, header_indexes
+
+    raise ValueError(
+        "Missing required event sheet columns: serial_number, event_title, event_date, venue"
+    )
 
 
 def parse_event_date(value: str) -> date:
@@ -80,7 +91,7 @@ def format_monthly_events_summary(events: list[Event]) -> str:
     return "\n".join(lines)
 
 
-def _header_indexes(header: list[str]) -> dict[str, int]:
+def _header_indexes(header: list[str], raise_on_missing: bool = True) -> dict[str, int] | None:
     normalized = {_normalize_header(value): index for index, value in enumerate(header)}
 
     required = {
@@ -92,6 +103,8 @@ def _header_indexes(header: list[str]) -> dict[str, int]:
 
     missing = [label for label, key in required.items() if key not in normalized]
     if missing:
+        if not raise_on_missing:
+            return None
         raise ValueError(f"Missing required event sheet columns: {', '.join(missing)}")
 
     return {label: normalized[key] for label, key in required.items()}

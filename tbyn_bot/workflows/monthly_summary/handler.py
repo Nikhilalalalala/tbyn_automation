@@ -1,40 +1,46 @@
-"""Telegram update handlers for TBYN workflows."""
+"""Telegram command handler for monthly event summaries."""
 
 from __future__ import annotations
 
+from collections.abc import Callable
 import logging
-from typing import Callable
 
-from .commands import parse_poll_event_command
+from tbyn_bot.bot.permissions import is_admin_status
+from tbyn_bot.config import Config
+
+from .commands import is_monthly_summary_command
 from .messages import (
     ADMIN_CHECK_FAILED_MESSAGE,
+    CONFIG_ERROR_MESSAGE,
     NON_ADMIN_MESSAGE,
-    USAGE_MESSAGE,
+    SEND_ERROR_MESSAGE,
     mention_prefixed_message,
 )
-from tbyn_bot.bot.permissions import is_admin_status
-from .polls import build_event_poll
+from .runner import send_monthly_summary_to_chat
 
 
 GROUP_CHAT_TYPES = {"group", "supergroup"}
 
 
-class EventPollHandler:
+class MonthlySummaryHandler:
     def __init__(
         self,
         client,
+        config: Config,
         delete_after_seconds: int = 20,
         schedule_delete: Callable | None = None,
+        send_summary: Callable | None = None,
     ) -> None:
         self.client = client
+        self.config = config
         self.delete_after_seconds = delete_after_seconds
         self.schedule_delete = schedule_delete
+        self.send_summary = send_summary or send_monthly_summary_to_chat
 
     def handle_update(self, update: dict) -> bool:
         message = update.get("message") or {}
         text = message.get("text") or ""
-        parsed = parse_poll_event_command(text)
-        if parsed is None:
+        if not is_monthly_summary_command(text):
             return False
 
         chat = message.get("chat") or {}
@@ -45,7 +51,7 @@ class EventPollHandler:
         user = message.get("from") or {}
         user_id = user.get("id")
         if user_id is None:
-            logging.warning("Poll command ignored because sender user id is missing")
+            logging.warning("Monthly summary command ignored because sender user id is missing")
             return True
 
         try:
@@ -59,13 +65,18 @@ class EventPollHandler:
             self._send_temporary_reply(chat_id, user, NON_ADMIN_MESSAGE)
             return True
 
-        if not parsed.has_argument:
-            self._send_temporary_reply(chat_id, user, USAGE_MESSAGE)
+        try:
+            self.send_summary(self.config, self.client, chat_id)
+        except RuntimeError:
+            logging.exception("Monthly summary configuration error")
+            self._send_temporary_reply(chat_id, user, CONFIG_ERROR_MESSAGE)
+            return True
+        except Exception:
+            logging.exception("Failed to send monthly summary")
+            self._send_temporary_reply(chat_id, user, SEND_ERROR_MESSAGE)
             return True
 
-        poll = build_event_poll(parsed.argument)
-        self.client.send_poll(chat_id, poll)
-        logging.info("Sent event poll", extra={"chat_id": chat_id, "poll_title": parsed.argument})
+        logging.info("Sent monthly event summary", extra={"chat_id": chat_id})
         return True
 
     def _is_group_admin(self, chat_id: int, user_id: int) -> bool:

@@ -43,6 +43,7 @@ Rules:
 
 - Use Python 3.11+.
 - Prefer the Python standard library unless a dependency clearly helps.
+- Manage runtime dependencies in `requirements.txt`.
 - Keep functions small and named for the workflow language.
 - Use type hints where they improve readability.
 - Avoid clever abstractions; this repo should feel readable to volunteers.
@@ -64,6 +65,7 @@ Add or update tests whenever behavior changes, especially for:
 Run before finishing:
 
 ```bash
+python3 -m pip install -r requirements.txt
 python3 -m unittest discover -v
 python3 -m compileall -q tbyn_bot main.py tests
 ```
@@ -104,9 +106,14 @@ Run the Telegram polling bot:
 python3 main.py
 ```
 
-Run the monthly summary workflow manually:
+Trigger an event poll from Telegram:
 
-```bash
-python3 -m tbyn_bot.workflows.monthly_summary
+```text
+/poll_event Meeting on 6th June
 ```
 
+Trigger the monthly summary from Telegram:
+
+```text
+/monthly_summary
+```

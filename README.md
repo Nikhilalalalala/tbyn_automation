@@ -1,50 +1,34 @@
-# TBYN Telegram Poll Bot
+# TBYN Automation Bot
 
-This is the first small automation workflow for Tiong Bahru Youth Network (TBYN). It runs a Telegram bot command that lets a group admin create an event attendance poll.
-
-## What It Does
-
-In a Telegram group, an admin sends:
-
-```text
-/poll_event Meeting on 6th June
-```
-
-The bot posts a non-anonymous, single-choice poll:
-
-```text
-Meeting on 6th June
-```
-
-Options:
-
-```text
-Yes, I'll be there!
-Sorry, I'll join next time
-```
-
-The bot randomly chooses one friendly yes option and one friendly no option from predefined variation lists each time it creates a poll.
-
-If the command is missing the date, or if a non-admin tries to use it, the bot posts a short group message and attempts to delete that message after 20 seconds.
+This repo contains small Python automation workflows for Tiong Bahru Youth Network (TBYN). The bot is designed to stay readable for volunteer handover while leaving room for future workflows.
 
 ## Requirements
 
 - Python 3.11 or newer
 - A Telegram bot token from BotFather
 - The bot added to the target Telegram group
-- Bot permissions to send polls and delete its own messages
+- Bot permissions to send polls and delete its own temporary messages
 
-No Python package installation is needed for the Telegram poll command.
+## Dependency Setup
 
-The Google Sheets monthly summary workflow needs these extra packages:
+Create a virtual environment:
 
 ```bash
-pip install google-api-python-client google-auth
+python3 -m venv .venv
+source .venv/bin/activate
 ```
+
+Install runtime dependencies:
+
+```bash
+python3 -m pip install -r requirements.txt
+```
+
+The Telegram poll command uses only the Python standard library. The packages in `requirements.txt` are for the Google Sheets monthly summary workflow.
 
 ## Local Setup
 
-Copy the example environment file and set your token:
+Copy the example environment file:
 
 ```bash
 cp .env.example .env
@@ -56,19 +40,12 @@ Edit `.env`:
 TELEGRAM_BOT_TOKEN=your-bot-token
 VALIDATION_DELETE_AFTER_SECONDS=20
 POLLING_TIMEOUT_SECONDS=30
-MONTHLY_SUMMARY_CHAT_ID=your-telegram-chat-id
 GOOGLE_SHEET_ID=your-google-sheet-id
 GOOGLE_SERVICE_ACCOUNT_FILE=google-service-account.json
 GOOGLE_EVENTS_RANGE=Events!A:D
 ```
 
-Run the bot:
-
-```bash
-python3 main.py
-```
-
-The app reads `.env` automatically for local development. On a cloud host, set the same values as environment variables in the host dashboard; those real environment variables take precedence over `.env`.
+The app reads `.env` automatically for local development. On a cloud host, set the same values as environment variables in the host dashboard; real environment variables take precedence over `.env`.
 
 ## Telegram Setup
 
@@ -77,47 +54,7 @@ The app reads `.env` automatically for local development. On a cloud host, set t
 3. Make the bot an admin if you want it to reliably check admin status and delete temporary validation messages.
 4. In BotFather, consider disabling privacy mode if the bot does not receive group commands.
 
-## Testing
-
-Run:
-
-```bash
-python3 -m unittest discover
-```
-
-## Monthly Event Summary Workflow
-
-The monthly summary workflow reads a Google Sheet with this structure:
-
-```text
-S/N | Event TItle | Event Date | Venue
-```
-
-Example rows:
-
-```text
-5 | Fun Times! - March | 14/3/2026 | Science Centre Omni-Theatre
-6 | Earth & Us! - Thrift, Trade, Transform | 28/3/2026 | The Nest @ TBCC
-7 | Board Game Afternoon | 29/3/2026 | The Nest @ TBCC
-```
-
-On the 1st day of the month, it filters events for that month and sends a Telegram message like:
-
-```text
-Whats happening this month:
-1. Fun Times! - March @ Science Centre Omni-Theatre - 14/3/2026
-2. Earth & Us! - Thrift, Trade, Transform @ The Nest @ TBCC - 28/3/2026
-3. Board Game Afternoon @ The Nest @ TBCC - 29/3/2026
-```
-
-Set these environment variables before enabling the workflow:
-
-```text
-MONTHLY_SUMMARY_CHAT_ID
-GOOGLE_SHEET_ID
-GOOGLE_SERVICE_ACCOUNT_FILE
-GOOGLE_EVENTS_RANGE
-```
+## Google Sheets Setup
 
 Use a Google service account for automation:
 
@@ -127,35 +64,47 @@ Use a Google service account for automation:
 4. Set `GOOGLE_SERVICE_ACCOUNT_FILE` to the JSON file path.
 5. Set `GOOGLE_SHEET_ID` from the spreadsheet URL.
 
-Run the workflow manually:
+## Running Locally
+
+Run the Telegram polling bot:
 
 ```bash
-python3 -m tbyn_bot.workflows.monthly_summary
+python3 main.py
 ```
 
-Later, schedule that command on your cloud host for the 1st day of every month.
+Then trigger workflows from Telegram commands in a group where the bot is installed.
+
+## Testing
+
+Run:
+
+```bash
+python3 -m unittest discover
+```
+
+For a fuller verification pass:
+
+```bash
+python3 -m unittest discover -v
+python3 -m compileall -q tbyn_bot main.py tests
+```
 
 ## Cheap Cloud Hosting
 
-Deploy this as a long-running Python worker process on a low-cost host that supports persistent background workers. Set the same environment variables on the host:
+Deploy `python3 main.py` as a long-running Python worker process on a low-cost host that supports persistent background workers.
+
+Set these environment variables on the host:
 
 ```text
 TELEGRAM_BOT_TOKEN
 VALIDATION_DELETE_AFTER_SECONDS
 POLLING_TIMEOUT_SECONDS
-MONTHLY_SUMMARY_CHAT_ID
 GOOGLE_SHEET_ID
 GOOGLE_SERVICE_ACCOUNT_FILE
 GOOGLE_EVENTS_RANGE
 ```
 
-Use `python3 main.py` as the worker start command.
-
-## Future Workflow Shape
-
-The bot is intentionally split into command parsing, permission checks, poll construction, Telegram API calls, cleanup, configuration, workflow registration, and app startup.
-
-The main package layout is:
+## Project Structure
 
 ```text
 tbyn_bot/
@@ -175,3 +124,64 @@ tbyn_bot/
 ```
 
 Future TBYN workflows should get their own folder under `tbyn_bot/workflows/` and be registered in `tbyn_bot/workflows/registry.py` instead of rewriting the polling loop.
+
+## Workflows
+
+<details>
+<summary>Event Poll Workflow</summary>
+
+In a Telegram group, an admin sends:
+
+```text
+/poll_event Meeting on 6th June
+```
+
+The bot posts a non-anonymous, single-choice poll with the title exactly as written:
+
+```text
+Meeting on 6th June
+```
+
+The bot randomly chooses one friendly yes option and one friendly no option from predefined variation lists each time it creates a poll.
+
+If the command is missing the title, or if a non-admin tries to use it, the bot posts a short group message and attempts to delete that message after 20 seconds.
+
+Workflow docs: `tbyn_bot/workflows/event_poll/README.md`
+
+</details>
+
+<details>
+<summary>Monthly Event Summary Workflow</summary>
+
+The monthly summary workflow reads a Google Sheet with this structure:
+
+```text
+S/N | Event TItle | Event Date | Venue
+```
+
+Example rows:
+
+```text
+5 | Fun Times! - March | 14/3/2026 | Science Centre Omni-Theatre
+6 | Earth & Us! - Thrift, Trade, Transform | 28/3/2026 | The Nest @ TBCC
+7 | Board Game Afternoon | 29/3/2026 | The Nest @ TBCC
+```
+
+In a Telegram group, an admin sends:
+
+```text
+/monthly_summary
+```
+
+The bot filters events for the current month and sends a Telegram message like:
+
+```text
+Whats happening this month:
+1. Fun Times! - March @ Science Centre Omni-Theatre - 14/3/2026
+2. Earth & Us! - Thrift, Trade, Transform @ The Nest @ TBCC - 28/3/2026
+3. Board Game Afternoon @ The Nest @ TBCC - 29/3/2026
+```
+
+Workflow docs: `tbyn_bot/workflows/monthly_summary/README.md`
+
+</details>
