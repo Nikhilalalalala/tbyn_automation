@@ -122,6 +122,13 @@ class DotenvTest(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "GOOGLE_AUTH_MODE"):
             load_config()
 
+    def test_load_config_rejects_service_account_google_auth_mode(self):
+        os.environ["TELEGRAM_BOT_TOKEN"] = "abc123"
+        os.environ["GOOGLE_AUTH_MODE"] = "service_account"
+
+        with self.assertRaisesRegex(RuntimeError, "GOOGLE_AUTH_MODE=oauth"):
+            load_config()
+
 
 if __name__ == "__main__":
     unittest.main()

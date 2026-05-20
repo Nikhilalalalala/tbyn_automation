@@ -59,7 +59,7 @@ Any other non-blank line is rejected so agenda content is not silently dropped.
 
 ## Configuration
 
-Meeting slides use Google Drive and Google Slides. OAuth user auth is recommended so decks are created by a dedicated Google automation account, avoiding service-account Drive ownership and quota issues in personal Gmail Drive.
+Meeting slides use Google Drive and Google Slides. OAuth user auth is recommended so decks are created by a dedicated Google automation account.
 
 Set:
 
@@ -86,4 +86,4 @@ Setup:
 6. Keep `google-oauth-client.json` and `google-oauth-token.json` private.
 7. Keep `GOOGLE_MEETING_SLIDES_TEMPLATE_ID` and `GOOGLE_MEETING_SLIDES_FOLDER_ID` pointed at the approved template deck and output folder.
 
-The monthly summary workflow can continue using `GOOGLE_SERVICE_ACCOUNT_FILE` for Google Sheets. Do not commit real Google credential JSON files, OAuth tokens, spreadsheet IDs, or Drive IDs.
+Do not commit real Google OAuth credential JSON files, OAuth tokens, spreadsheet IDs, or Drive IDs.

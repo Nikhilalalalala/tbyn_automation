@@ -46,11 +46,14 @@ Then send this command in a Telegram group where the bot is installed:
 ```text
 TELEGRAM_BOT_TOKEN
 GOOGLE_SHEET_ID
-GOOGLE_SERVICE_ACCOUNT_FILE
 GOOGLE_EVENTS_RANGE
+GOOGLE_AUTH_MODE
+GOOGLE_OAUTH_TOKEN_FILE
 ```
 
 `GOOGLE_EVENTS_RANGE` defaults to `Events!A:D`.
+Set `GOOGLE_AUTH_MODE=oauth` and share the Google Sheet with the automation Google account used to generate `GOOGLE_OAUTH_TOKEN_FILE`.
+If the OAuth token was created before this workflow used OAuth, regenerate it with `python3 -m tbyn_bot.google_oauth_setup`.
 
 ## Main Files
 

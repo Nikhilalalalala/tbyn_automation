@@ -42,7 +42,6 @@ TELEGRAM_BOT_TOKEN=your-bot-token
 VALIDATION_DELETE_AFTER_SECONDS=20
 POLLING_TIMEOUT_SECONDS=30
 GOOGLE_SHEET_ID=your-google-sheet-id
-GOOGLE_SERVICE_ACCOUNT_FILE=google-service-account.json
 GOOGLE_EVENTS_RANGE=Events!A:D
 GOOGLE_AUTH_MODE=oauth
 GOOGLE_OAUTH_CLIENT_SECRETS_FILE=google-oauth-client.json
@@ -75,22 +74,11 @@ After startup or manual registration, typing `/` in a Telegram chat with the bot
 /create_meeting_slides
 ```
 
-## Google Sheets Setup
+## Google OAuth Setup
 
-Use a Google service account for the monthly event summary:
+Use OAuth user auth with a dedicated Google automation account for Google workflows. The same OAuth token is used to read the events sheet and create meeting slide decks.
 
-1. Enable the Google Sheets API in Google Cloud Console.
-2. Create a service account in Google Cloud.
-3. Download the service account JSON file.
-4. Share the Google Sheet with the service account email.
-5. Set `GOOGLE_SERVICE_ACCOUNT_FILE` to the JSON file path.
-6. Set `GOOGLE_SHEET_ID` from the spreadsheet URL.
-
-## Google Slides Setup
-
-Use OAuth user auth for meeting slide generation. A dedicated Google automation account is recommended so generated decks are owned by that account instead of a volunteer's personal account.
-
-1. Enable the Google Drive API and Google Slides API in Google Cloud Console.
+1. Enable the Google Sheets API, Google Drive API, and Google Slides API in Google Cloud Console.
 2. Create an OAuth client ID with application type `Desktop app`.
 3. Download the OAuth client secrets JSON as `google-oauth-client.json`.
 4. Sign in as the dedicated automation Google account and run:
@@ -102,8 +90,12 @@ Use OAuth user auth for meeting slide generation. A dedicated Google automation 
 5. Keep the generated `google-oauth-token.json` private.
 6. Set `GOOGLE_AUTH_MODE=oauth`.
 7. Set `GOOGLE_OAUTH_CLIENT_SECRETS_FILE` and `GOOGLE_OAUTH_TOKEN_FILE` to those local JSON paths.
-8. Set `GOOGLE_MEETING_SLIDES_TEMPLATE_ID` from the template deck URL.
-9. Set `GOOGLE_MEETING_SLIDES_FOLDER_ID` from the Drive folder URL.
+8. Share the events Google Sheet with the automation account email.
+9. Set `GOOGLE_SHEET_ID` from the spreadsheet URL.
+10. Set `GOOGLE_MEETING_SLIDES_TEMPLATE_ID` from the template deck URL.
+11. Set `GOOGLE_MEETING_SLIDES_FOLDER_ID` from the Drive folder URL.
+
+If `google-oauth-token.json` was generated before the monthly summary used OAuth, regenerate it so the token includes the Google Sheets readonly scope.
 
 The template deck must contain three slide designs with these placeholders:
 
@@ -158,7 +150,6 @@ TELEGRAM_BOT_TOKEN
 VALIDATION_DELETE_AFTER_SECONDS
 POLLING_TIMEOUT_SECONDS
 GOOGLE_SHEET_ID
-GOOGLE_SERVICE_ACCOUNT_FILE
 GOOGLE_EVENTS_RANGE
 GOOGLE_AUTH_MODE
 GOOGLE_OAUTH_CLIENT_SECRETS_FILE

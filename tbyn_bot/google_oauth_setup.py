@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 
 from tbyn_bot.config import load_dotenv
-from tbyn_bot.integrations.meeting_slides import SCOPES
+from tbyn_bot.integrations.google_oauth import SCOPES
 
 
 def run_oauth_installed_app_flow(

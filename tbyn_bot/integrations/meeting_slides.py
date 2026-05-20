@@ -5,9 +5,8 @@ from __future__ import annotations
 from collections.abc import Iterable
 from typing import Any
 
+from tbyn_bot.integrations.google_oauth import DRIVE_SCOPE, PRESENTATIONS_SCOPE
 
-DRIVE_SCOPE = "https://www.googleapis.com/auth/drive"
-PRESENTATIONS_SCOPE = "https://www.googleapis.com/auth/presentations"
 SCOPES = [DRIVE_SCOPE, PRESENTATIONS_SCOPE]
 
 MEETING_TITLE_PLACEHOLDER = "{{MEETING_TITLE}}"
@@ -27,13 +26,11 @@ def create_meeting_slides_from_template(
     output_folder_id: str,
     deck_title: str,
     slides: list,
-    service_account_file: str = "",
-    auth_mode: str = "service_account",
+    auth_mode: str = "oauth",
     oauth_token_file: str = "",
 ) -> str:
     """Copy a template deck, populate meeting slides, and return the edit URL."""
     try:
-        from google.oauth2 import service_account
         from google.oauth2.credentials import Credentials as OAuthCredentials
         from googleapiclient.discovery import build
     except ImportError as exc:
@@ -47,10 +44,8 @@ def create_meeting_slides_from_template(
         output_folder_id,
         deck_title,
         slides,
-        service_account_file,
         auth_mode=auth_mode,
         oauth_token_file=oauth_token_file,
-        credentials_factory=service_account.Credentials.from_service_account_file,
         oauth_credentials_factory=OAuthCredentials.from_authorized_user_file,
         service_builder=build,
     )
@@ -61,18 +56,14 @@ def _create_meeting_slides_from_template(
     output_folder_id: str,
     deck_title: str,
     slides: list,
-    service_account_file: str,
-    credentials_factory: Any,
     service_builder: Any,
-    auth_mode: str = "service_account",
+    auth_mode: str = "oauth",
     oauth_token_file: str = "",
     oauth_credentials_factory: Any | None = None,
 ) -> str:
     credentials = _build_credentials(
-        service_account_file,
         auth_mode=auth_mode,
         oauth_token_file=oauth_token_file,
-        service_account_credentials_factory=credentials_factory,
         oauth_credentials_factory=oauth_credentials_factory,
     )
     drive_service = service_builder("drive", "v3", credentials=credentials)
@@ -111,19 +102,11 @@ def _create_meeting_slides_from_template(
 
 
 def _build_credentials(
-    service_account_file: str,
     auth_mode: str,
     oauth_token_file: str,
-    service_account_credentials_factory: Any,
     oauth_credentials_factory: Any | None,
 ) -> Any:
     normalized_auth_mode = auth_mode.strip().lower()
-
-    if normalized_auth_mode in {"", "service_account"}:
-        return service_account_credentials_factory(
-            service_account_file,
-            scopes=SCOPES,
-        )
 
     if normalized_auth_mode == "oauth":
         if not oauth_token_file:
@@ -136,7 +119,7 @@ def _build_credentials(
         )
 
     raise RuntimeError(
-        "GOOGLE_AUTH_MODE must be 'service_account' or 'oauth'"
+        "GOOGLE_AUTH_MODE=oauth is required"
     )
 
 

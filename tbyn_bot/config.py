@@ -13,7 +13,6 @@ class Config:
     validation_delete_after_seconds: int = 20
     polling_timeout_seconds: int = 30
     google_sheet_id: str = ""
-    google_service_account_file: str = ""
     google_events_range: str = "Events!A:D"
     google_auth_mode: str = "oauth"
     google_oauth_client_secrets_file: str = "google-oauth-client.json"
@@ -37,7 +36,6 @@ def load_config() -> Config:
         ),
         polling_timeout_seconds=_read_int("POLLING_TIMEOUT_SECONDS", default=30),
         google_sheet_id=os.environ.get("GOOGLE_SHEET_ID", "").strip(),
-        google_service_account_file=os.environ.get("GOOGLE_SERVICE_ACCOUNT_FILE", "").strip(),
         google_events_range=os.environ.get("GOOGLE_EVENTS_RANGE", "Events!A:D").strip(),
         google_auth_mode=_read_google_auth_mode(),
         google_oauth_client_secrets_file=os.environ.get(
@@ -103,6 +101,6 @@ def _read_int(name: str, default: int) -> int:
 
 def _read_google_auth_mode() -> str:
     auth_mode = os.environ.get("GOOGLE_AUTH_MODE", "oauth").strip().lower()
-    if auth_mode not in {"service_account", "oauth"}:
-        raise RuntimeError("GOOGLE_AUTH_MODE must be service_account or oauth")
+    if auth_mode != "oauth":
+        raise RuntimeError("GOOGLE_AUTH_MODE=oauth is required")
     return auth_mode

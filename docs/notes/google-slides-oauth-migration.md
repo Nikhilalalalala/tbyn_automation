@@ -32,7 +32,7 @@ This limits blast radius at the account boundary. Google OAuth scopes cannot be 
 
 ## Implementation Plan
 
-Add OAuth support for Google Slides/Drive while keeping the current service-account Sheets workflow unchanged unless we explicitly decide to migrate Sheets too.
+Add OAuth support for Google Slides/Drive. The Sheets workflow was later migrated to the same OAuth token so the bot only needs one Google credential path.
 
 Suggested config:
 
@@ -44,11 +44,11 @@ GOOGLE_OAUTH_TOKEN_FILE=google-oauth-token.json
 
 Recommended behavior:
 
-- `monthly_summary` can continue using service account auth for Google Sheets.
+- `monthly_summary` uses OAuth with the same `GOOGLE_OAUTH_TOKEN_FILE`.
 - `create_meeting_slides` should use OAuth when `GOOGLE_AUTH_MODE=oauth`.
 - Keep `GOOGLE_MEETING_SLIDES_TEMPLATE_ID` and `GOOGLE_MEETING_SLIDES_FOLDER_ID`.
 - Keep an app-level allowlist: the bot should only copy from the configured template ID and only write into the configured folder ID.
-- Do not commit OAuth client secrets, refresh tokens, service account JSON, or real Drive IDs.
+- Do not commit OAuth client secrets, refresh tokens, spreadsheet IDs, or real Drive IDs.
 
 Possible OAuth scopes:
 

@@ -220,8 +220,8 @@ class GoogleSlidesTest(unittest.TestCase):
                 SlidePlanItem("meeting_title", "TBYN Meeting May 2026"),
                 SlidePlanItem("agenda_title", "Confirmation"),
             ],
-            "service-account.json",
-            credentials_factory=fake_google.credentials_factory,
+            oauth_token_file="google-oauth-token.json",
+            oauth_credentials_factory=fake_google.oauth_credentials_factory,
             service_builder=fake_google.service_builder,
         )
 
@@ -251,7 +251,7 @@ class GoogleSlidesTest(unittest.TestCase):
             "https://docs.google.com/presentation/d/copied-id/edit",
         )
 
-    def test_defaults_to_service_account_credentials_for_template_copy(self):
+    def test_requires_oauth_token_credentials_for_template_copy(self):
         fake_google = FakeGoogleServices()
 
         _create_meeting_slides_from_template(
@@ -259,14 +259,13 @@ class GoogleSlidesTest(unittest.TestCase):
             "folder-id",
             "TBYN Meeting May 2026",
             [],
-            "service-account.json",
-            credentials_factory=fake_google.credentials_factory,
+            oauth_token_file="google-oauth-token.json",
+            oauth_credentials_factory=fake_google.oauth_credentials_factory,
             service_builder=fake_google.service_builder,
         )
 
-        self.assertEqual(fake_google.service_account_file, "service-account.json")
-        self.assertEqual(fake_google.oauth_token_file, None)
-        self.assertEqual(fake_google.credentials, "service-account-credentials")
+        self.assertEqual(fake_google.oauth_token_file, "google-oauth-token.json")
+        self.assertEqual(fake_google.credentials, "oauth-credentials")
 
     def test_uses_oauth_token_credentials_for_template_copy_when_requested(self):
         fake_google = FakeGoogleServices()
@@ -276,15 +275,12 @@ class GoogleSlidesTest(unittest.TestCase):
             "folder-id",
             "TBYN Meeting May 2026",
             [],
-            "service-account.json",
             auth_mode="oauth",
             oauth_token_file="google-oauth-token.json",
-            credentials_factory=fake_google.credentials_factory,
             oauth_credentials_factory=fake_google.oauth_credentials_factory,
             service_builder=fake_google.service_builder,
         )
 
-        self.assertEqual(fake_google.service_account_file, None)
         self.assertEqual(fake_google.oauth_token_file, "google-oauth-token.json")
         self.assertEqual(
             fake_google.scopes,
@@ -295,10 +291,11 @@ class GoogleSlidesTest(unittest.TestCase):
         )
         self.assertEqual(fake_google.credentials, "oauth-credentials")
 
-    def test_public_template_copy_allows_oauth_without_service_account_file(self):
+    def test_public_template_copy_uses_oauth_arguments_only(self):
         parameters = signature(create_meeting_slides_from_template).parameters
 
-        self.assertEqual(parameters["service_account_file"].default, "")
+        self.assertNotIn("service_account_file", parameters)
+        self.assertEqual(parameters["auth_mode"].default, "oauth")
 
     def test_runs_oauth_installed_app_flow_and_writes_token_file(self):
         fake_flow_factory = FakeOAuthFlowFactory()
@@ -319,6 +316,7 @@ class GoogleSlidesTest(unittest.TestCase):
                 "scopes": [
                     "https://www.googleapis.com/auth/drive",
                     "https://www.googleapis.com/auth/presentations",
+                    "https://www.googleapis.com/auth/spreadsheets.readonly",
                 ],
             },
         )
@@ -336,15 +334,9 @@ class GoogleSlidesTest(unittest.TestCase):
 class FakeGoogleServices:
     def __init__(self):
         self.scopes = None
-        self.service_account_file = None
         self.oauth_token_file = None
         self.drive = FakeDriveService()
         self.slides = FakeSlidesService()
-
-    def credentials_factory(self, service_account_file, scopes):
-        self.service_account_file = service_account_file
-        self.scopes = scopes
-        return "service-account-credentials"
 
     def oauth_credentials_factory(self, oauth_token_file, scopes):
         self.oauth_token_file = oauth_token_file

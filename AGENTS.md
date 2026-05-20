@@ -77,7 +77,7 @@ python3 -m compileall -q tbyn_bot main.py tests
 ## Configuration And Secrets
 
 - Read local settings from `.env`.
-- Do not commit real tokens, chat IDs, service account JSON, or private spreadsheet IDs.
+- Do not commit real tokens, chat IDs, OAuth credential JSON, or private spreadsheet IDs.
 - Keep `.env.example` updated when adding config.
 - Real environment variables should take precedence over `.env`.
 
@@ -91,7 +91,7 @@ python3 -m compileall -q tbyn_bot main.py tests
 
 ## Google Sheets Standards
 
-- Use service account auth for automation.
+- Use OAuth user auth for automation.
 - Google Sheets workflows require the Google Sheets API enabled in Google Cloud Console.
 - Keep Google Sheets code in `tbyn_bot/integrations/google_sheets.py`.
 - Keep parsing and formatting pure and testable in workflow modules.
@@ -100,7 +100,7 @@ python3 -m compileall -q tbyn_bot main.py tests
 ## Google Slides Standards
 
 - Use OAuth user auth for Drive/Slides write operations when `GOOGLE_AUTH_MODE=oauth`.
-- Keep service account support available for existing setups, but prefer a dedicated Google automation account for meeting slide generation.
+- Prefer a dedicated Google automation account for meeting slide generation.
 - Google Slides workflows require the Google Drive API and Google Slides API enabled in Google Cloud Console.
 - Keep meeting slide Drive/Slides code in `tbyn_bot/integrations/meeting_slides.py`.
 - Keep agenda parsing and slide planning pure and testable in workflow modules.

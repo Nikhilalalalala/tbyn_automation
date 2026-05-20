@@ -25,17 +25,19 @@ def send_monthly_summary_to_chat(
     telegram_client: TelegramClient,
     chat_id: int,
     today: date | None = None,
-    read_values: Callable[[str, str, str], list[list[str]]] = read_sheet_values,
+    read_values: Callable[..., list[list[str]]] = read_sheet_values,
 ) -> None:
     if not config.google_sheet_id:
         raise RuntimeError("GOOGLE_SHEET_ID is required")
-    if not config.google_service_account_file:
-        raise RuntimeError("GOOGLE_SERVICE_ACCOUNT_FILE is required")
+    if config.google_auth_mode != "oauth":
+        raise RuntimeError("GOOGLE_AUTH_MODE=oauth is required for monthly summary")
+    if not config.google_oauth_token_file:
+        raise RuntimeError("GOOGLE_OAUTH_TOKEN_FILE is required")
 
     rows = read_values(
         spreadsheet_id=config.google_sheet_id,
         cell_range=config.google_events_range,
-        service_account_file=config.google_service_account_file,
+        oauth_token_file=config.google_oauth_token_file,
     )
     message = build_monthly_summary_message(rows, today=today)
     telegram_client.send_message(chat_id, message)

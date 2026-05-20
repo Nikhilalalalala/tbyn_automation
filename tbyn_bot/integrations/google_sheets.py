@@ -2,27 +2,37 @@
 
 from __future__ import annotations
 
+from typing import Any
 
-def read_sheet_values(spreadsheet_id: str, cell_range: str, service_account_file: str) -> list[list[str]]:
-    """Read values from Google Sheets using service account credentials.
+from tbyn_bot.integrations.google_oauth import SPREADSHEETS_READONLY_SCOPE
 
-    Install dependencies before using this integration:
-    pip install google-api-python-client google-auth
-    """
-    try:
-        from google.oauth2 import service_account
-        from googleapiclient.discovery import build
-    except ImportError as exc:
-        raise RuntimeError(
-            "Google Sheets dependencies are not installed. "
-            "Run: pip install google-api-python-client google-auth"
-        ) from exc
 
-    credentials = service_account.Credentials.from_service_account_file(
-        service_account_file,
-        scopes=["https://www.googleapis.com/auth/spreadsheets.readonly"],
+def read_sheet_values(
+    spreadsheet_id: str,
+    cell_range: str,
+    oauth_token_file: str,
+    credentials_factory: Any | None = None,
+    service_builder: Any | None = None,
+) -> list[list[str]]:
+    """Read values from Google Sheets using OAuth user credentials."""
+    if credentials_factory is None or service_builder is None:
+        try:
+            from google.oauth2.credentials import Credentials as OAuthCredentials
+            from googleapiclient.discovery import build
+        except ImportError as exc:
+            raise RuntimeError(
+                "Google Sheets dependencies are not installed. "
+                "Run: pip install google-api-python-client google-auth"
+            ) from exc
+
+        credentials_factory = credentials_factory or OAuthCredentials.from_authorized_user_file
+        service_builder = service_builder or build
+
+    credentials = credentials_factory(
+        oauth_token_file,
+        scopes=[SPREADSHEETS_READONLY_SCOPE],
     )
-    service = build("sheets", "v4", credentials=credentials)
+    service = service_builder("sheets", "v4", credentials=credentials)
     result = (
         service.spreadsheets()
         .values()

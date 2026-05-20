@@ -28,7 +28,6 @@ class CreateMeetingSlidesRunnerTest(unittest.TestCase):
             send_meeting_slides_to_chat(
                 config(
                     google_auth_mode="service_account",
-                    google_service_account_file="service-account.json",
                 ),
                 FakeTelegramClient(),
                 -1001,

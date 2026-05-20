@@ -11,7 +11,8 @@ def config():
     return Config(
         telegram_bot_token="token",
         google_sheet_id="sheet-id",
-        google_service_account_file="google-service-account.json",
+        google_auth_mode="oauth",
+        google_oauth_token_file="google-oauth-token.json",
     )
 
 
