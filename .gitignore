@@ -10,5 +10,10 @@ build/
 *.egg-info/
 
 google-service-account.json
+google-oauth-client.json
+google-oauth-token.json
 tbyn-telebot-automation-*.json
 credentials/*.json
+client_secret_*.json
+
+.docs/superpowers/*

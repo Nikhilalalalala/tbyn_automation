@@ -2,3 +2,4 @@
 google-service-account.json
 tbyn-telebot-automation-*.json
 credentials/*.json
+client_secret_*.json

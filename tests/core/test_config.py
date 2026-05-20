@@ -78,6 +78,50 @@ class DotenvTest(unittest.TestCase):
             self.assertEqual(config.validation_delete_after_seconds, 25)
             self.assertEqual(config.polling_timeout_seconds, 10)
 
+    def test_load_config_reads_meeting_slides_settings(self):
+        os.environ["TELEGRAM_BOT_TOKEN"] = "abc123"
+        os.environ["GOOGLE_MEETING_SLIDES_TEMPLATE_ID"] = "template-id"
+        os.environ["GOOGLE_MEETING_SLIDES_FOLDER_ID"] = "folder-id"
+
+        config = load_config()
+
+        self.assertEqual(config.google_meeting_slides_template_id, "template-id")
+        self.assertEqual(config.google_meeting_slides_folder_id, "folder-id")
+
+    def test_load_config_defaults_google_auth_mode_to_oauth_and_oauth_files(self):
+        with TemporaryDirectory() as temp_dir:
+            old_cwd = Path.cwd()
+            os.chdir(temp_dir)
+            try:
+                os.environ["TELEGRAM_BOT_TOKEN"] = "abc123"
+
+                config = load_config()
+            finally:
+                os.chdir(old_cwd)
+
+        self.assertEqual(config.google_auth_mode, "oauth")
+        self.assertEqual(config.google_oauth_client_secrets_file, "google-oauth-client.json")
+        self.assertEqual(config.google_oauth_token_file, "google-oauth-token.json")
+
+    def test_load_config_reads_google_oauth_settings(self):
+        os.environ["TELEGRAM_BOT_TOKEN"] = "abc123"
+        os.environ["GOOGLE_AUTH_MODE"] = " OAuth "
+        os.environ["GOOGLE_OAUTH_CLIENT_SECRETS_FILE"] = "client.json"
+        os.environ["GOOGLE_OAUTH_TOKEN_FILE"] = "token.json"
+
+        config = load_config()
+
+        self.assertEqual(config.google_auth_mode, "oauth")
+        self.assertEqual(config.google_oauth_client_secrets_file, "client.json")
+        self.assertEqual(config.google_oauth_token_file, "token.json")
+
+    def test_load_config_rejects_invalid_google_auth_mode(self):
+        os.environ["TELEGRAM_BOT_TOKEN"] = "abc123"
+        os.environ["GOOGLE_AUTH_MODE"] = "api_key"
+
+        with self.assertRaisesRegex(RuntimeError, "GOOGLE_AUTH_MODE"):
+            load_config()
+
 
 if __name__ == "__main__":
     unittest.main()

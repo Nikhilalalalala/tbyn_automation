@@ -1,6 +1,7 @@
 # Runtime dependencies.
 #
 # The Telegram polling bot uses only the Python standard library.
-# These Google packages are needed for the monthly Google Sheets summary workflow.
+# These Google packages are needed for the Google Sheets and Google Slides workflows.
 google-api-python-client>=2.0.0,<3.0.0
 google-auth>=2.0.0,<3.0.0
+google-auth-oauthlib>=1.0.0,<2.0.0

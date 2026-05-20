@@ -1,6 +1,7 @@
 import unittest
 
 from tbyn_bot.bot_commands import BOT_COMMANDS, register_bot_commands
+from tbyn_bot.workflows.create_meeting_slides import CREATE_MEETING_SLIDES_COMMAND
 from tbyn_bot.workflows.event_poll import POLL_EVENT_COMMAND
 from tbyn_bot.workflows.monthly_summary import MONTHLY_SUMMARY_COMMAND
 
@@ -26,6 +27,10 @@ class BotCommandsTest(unittest.TestCase):
                 {
                     "command": MONTHLY_SUMMARY_COMMAND.removeprefix("/"),
                     "description": "Send this month's event summary",
+                },
+                {
+                    "command": CREATE_MEETING_SLIDES_COMMAND.removeprefix("/"),
+                    "description": "Create meeting slides from an agenda",
                 },
             ],
         )

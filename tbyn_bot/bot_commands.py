@@ -6,6 +6,7 @@ import logging
 
 from tbyn_bot.config import load_config
 from tbyn_bot.integrations.telegram import TelegramClient
+from tbyn_bot.workflows.create_meeting_slides import CREATE_MEETING_SLIDES_COMMAND
 from tbyn_bot.workflows.event_poll import POLL_EVENT_COMMAND
 from tbyn_bot.workflows.monthly_summary import MONTHLY_SUMMARY_COMMAND
 
@@ -18,6 +19,10 @@ BOT_COMMANDS = [
     {
         "command": MONTHLY_SUMMARY_COMMAND.removeprefix("/"),
         "description": "Send this month's event summary",
+    },
+    {
+        "command": CREATE_MEETING_SLIDES_COMMAND.removeprefix("/"),
+        "description": "Create meeting slides from an agenda",
     },
 ]
 

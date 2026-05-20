@@ -15,6 +15,11 @@ class Config:
     google_sheet_id: str = ""
     google_service_account_file: str = ""
     google_events_range: str = "Events!A:D"
+    google_auth_mode: str = "oauth"
+    google_oauth_client_secrets_file: str = "google-oauth-client.json"
+    google_oauth_token_file: str = "google-oauth-token.json"
+    google_meeting_slides_template_id: str = ""
+    google_meeting_slides_folder_id: str = ""
 
 
 def load_config() -> Config:
@@ -34,6 +39,23 @@ def load_config() -> Config:
         google_sheet_id=os.environ.get("GOOGLE_SHEET_ID", "").strip(),
         google_service_account_file=os.environ.get("GOOGLE_SERVICE_ACCOUNT_FILE", "").strip(),
         google_events_range=os.environ.get("GOOGLE_EVENTS_RANGE", "Events!A:D").strip(),
+        google_auth_mode=_read_google_auth_mode(),
+        google_oauth_client_secrets_file=os.environ.get(
+            "GOOGLE_OAUTH_CLIENT_SECRETS_FILE",
+            "google-oauth-client.json",
+        ).strip(),
+        google_oauth_token_file=os.environ.get(
+            "GOOGLE_OAUTH_TOKEN_FILE",
+            "google-oauth-token.json",
+        ).strip(),
+        google_meeting_slides_template_id=os.environ.get(
+            "GOOGLE_MEETING_SLIDES_TEMPLATE_ID",
+            "",
+        ).strip(),
+        google_meeting_slides_folder_id=os.environ.get(
+            "GOOGLE_MEETING_SLIDES_FOLDER_ID",
+            "",
+        ).strip(),
     )
 
 
@@ -77,3 +99,10 @@ def _read_int(name: str, default: int) -> int:
         return int(raw_value)
     except ValueError as exc:
         raise RuntimeError(f"{name} must be an integer") from exc
+
+
+def _read_google_auth_mode() -> str:
+    auth_mode = os.environ.get("GOOGLE_AUTH_MODE", "oauth").strip().lower()
+    if auth_mode not in {"service_account", "oauth"}:
+        raise RuntimeError("GOOGLE_AUTH_MODE must be service_account or oauth")
+    return auth_mode

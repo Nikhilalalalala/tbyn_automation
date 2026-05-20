@@ -10,6 +10,7 @@ Current workflows:
 
 1. `event_poll`: Telegram admins can create event attendance polls with `/poll_event`.
 2. `monthly_summary`: reads a Google Sheet and sends a Telegram summary of events happening in the current month.
+3. `create_meeting_slides`: Telegram admins can create a Google Slides meeting deck from a structured agenda with `/create_meeting_slides`.
 
 Keep the code easy for future volunteers to understand and hand over.
 
@@ -28,6 +29,7 @@ tbyn_bot/
     registry.py
     event_poll/
     monthly_summary/
+    create_meeting_slides/
 ```
 
 Rules:
@@ -59,6 +61,8 @@ Add or update tests whenever behavior changes, especially for:
 - poll payloads
 - event row parsing
 - monthly filtering
+- agenda parsing
+- slide plan generation
 - message formatting
 - config loading
 
@@ -88,9 +92,20 @@ python3 -m compileall -q tbyn_bot main.py tests
 ## Google Sheets Standards
 
 - Use service account auth for automation.
+- Google Sheets workflows require the Google Sheets API enabled in Google Cloud Console.
 - Keep Google Sheets code in `tbyn_bot/integrations/google_sheets.py`.
 - Keep parsing and formatting pure and testable in workflow modules.
 - Do not require Google client libraries for the normal unit test suite.
+
+## Google Slides Standards
+
+- Use OAuth user auth for Drive/Slides write operations when `GOOGLE_AUTH_MODE=oauth`.
+- Keep service account support available for existing setups, but prefer a dedicated Google automation account for meeting slide generation.
+- Google Slides workflows require the Google Drive API and Google Slides API enabled in Google Cloud Console.
+- Keep meeting slide Drive/Slides code in `tbyn_bot/integrations/meeting_slides.py`.
+- Keep agenda parsing and slide planning pure and testable in workflow modules.
+- Do not require real Google API calls for the normal unit test suite.
+- Meeting slide templates should use explicit placeholders such as `{{MEETING_TITLE}}`, `{{AGENDA_TITLE}}`, `{{AGENDA_ITEM_TITLE}}`, and `{{AGENDA_ITEM_BODY}}`.
 
 ## Documentation
 
@@ -116,6 +131,14 @@ Trigger the monthly summary from Telegram:
 
 ```text
 /events_this_month
+```
+
+Create meeting slides from Telegram:
+
+```text
+/create_meeting_slides TBYN Meeting May 2026
+1. Confirmation of Last Meeting Minutes
+   a. Follow-up Item
 ```
 
 The bot registers Telegram command suggestions on startup. To re-register them
